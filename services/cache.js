@@ -18,7 +18,7 @@ redisclient.on("error", (err) => {
 // Add caching
 mongoose.Query.prototype.cache = function (options = {}) {
   this.useCache = true;
-  this.hashKey = JSON.stringify(options.key || ""); // Key for hashing Must be a string
+  this.hashKey = JSON.stringify(options.key || ""); // Key for Redis hashing Must be a string
 
   return this; // Return 'this' for chaining
 };
