@@ -1,20 +1,14 @@
-const puppeteer = require("puppeteer");
-const sessionFactory = require("./factories/session");
-const userFactory = require("./factories/user");
+const Page = require("./helpers/page");
 
-let browser, page;
+let page;
 
 beforeEach(async () => {
-  browser = await puppeteer.launch({
-    headless: false,
-  });
-
-  page = await browser.newPage();
+  page = await Page.build();
   await page.goto("localhost:3000");
 });
 
 afterEach(async () => {
-  // await browser.close();
+  await page.close();
 });
 
 test("lets lunch browser", async () => {
@@ -31,18 +25,10 @@ test("Clicking login starts oauth flow", async () => {
   expect(url).toMatch(/accounts\.google\.com/);
 });
 
-test.only("Logout button", async () => {
-  const user = await userFactory();
-  console.log(user);
-  const { session, sessionSig } = sessionFactory(user);
+test("Logout button", async () => {
+  await page.login();
 
-  await page.setCookie({ name: "session", value: session });
-  await page.setCookie({ name: "session.sig", value: sessionSig });
-  await page.goto("localhost:3000");
-
-  await page.waitFor('a[href="/auth/logout"]');
-
-  const text = await page.$eval('a[href="/auth/logout"]', (el) => el.innerHTML);
+  const text = await page.getElementContent('a[href="/auth/logout"]');
 
   expect(text).toEqual("Logout");
 });
